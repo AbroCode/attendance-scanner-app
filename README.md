@@ -1,10 +1,10 @@
 # FaceAttend - Face Recognition Attendance System
 
-A production-ready face recognition attendance system for educational institutions. Built with Next.js 16, ml5.js, and TensorFlow.js for on-device face detection and recognition.
+A production-ready face recognition attendance system for educational institutions. Built with Next.js 16 with client-side camera capture and enrollment functionality.
 
 ## Features
 
-- **Real-time Face Recognition** - Client-side face detection with ml5.js
+- **Real-time Face Capture** - Client-side video streaming and image capture
 - **Student Enrollment** - Easy face enrollment with multiple capture support
 - **Attendance Scanner** - Live camera feed for instant attendance marking
 - **Admin Dashboard** - Comprehensive attendance logs and analytics
@@ -15,7 +15,7 @@ A production-ready face recognition attendance system for educational institutio
 ## Tech Stack
 
 - **Frontend**: Next.js 16, React 19.2, TypeScript, Tailwind CSS v4
-- **Face Detection**: ml5.js (powered by TensorFlow.js)
+- **Camera Capture**: Native browser MediaDevices API
 - **UI Components**: shadcn/ui with Radix UI
 - **Database**: PostgreSQL (Supabase recommended, or your own)
 - **Authentication**: Custom password-based auth with bcryptjs
@@ -184,24 +184,34 @@ The following endpoints need to be connected to your database:
 
 Each endpoint has TODO comments indicating where database operations should be added.
 
-## Face Recognition Setup
+## Face Capture & Recognition Setup
 
-### ml5.js for Face Detection
+### Client-Side Capture Process
 
-The system uses ml5.js which provides a simple interface to TensorFlow.js models:
-- `ml5` - Easy-to-use machine learning library with pre-trained models
-- Built on top of TensorFlow.js for powerful client-side ML
-- No server-side processing required
+The system captures face images using the browser's native MediaDevices API:
+- Real-time video feed from user's camera
+- Canvas-based frame capture and JPEG encoding
+- Base64 image data for transmission to server
+- Support for 1-10 face images per student
 
-Models are loaded automatically on the scanner and enrollment pages.
+### Face Recognition Process
 
-### Face Detection Process
+1. User camera feed is captured in real-time on the scanner page
+2. Canvas captures individual frames as JPEG images
+3. Face images are encoded as base64 and transmitted to backend
+4. Backend stores face images in database
+5. During attendance marking, captured image is sent to server for processing
+6. Server can implement face matching using your preferred ML model (coming soon)
 
-1. User camera feed is captured in real-time
-2. ml5.js detects faces using pre-trained neural networks
-3. Face coordinates and confidence scores are generated
-4. When a match is found, attendance is recorded with confidence score
-5. No personal data is sent to external servers - all processing is on-device
+### Integration with Face Recognition Models
+
+The system is designed to integrate with:
+- **OpenCV** - For server-side face detection and matching
+- **face_recognition** (Python library) - For face embeddings
+- **TensorFlow.js** - For client-side face detection (optional)
+- **AWS Rekognition** - For cloud-based face recognition (optional)
+
+See `ENROLLMENT_SETUP.md` for implementation details.
 
 ## Security Considerations
 

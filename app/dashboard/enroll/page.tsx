@@ -10,8 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Camera, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import ml5 from 'ml5';
-import { Loader2 } from 'lucide-react';
 
 interface CapturedFace {
   id: string;
@@ -32,8 +30,7 @@ export default function EnrollmentPage() {
     email: '',
     className: '',
   });
-  const [isDetecting, setIsDetecting] = useState(false);
-  const detectorRef = useRef<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -104,7 +101,15 @@ export default function EnrollmentPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
+      console.log('[v0] Submitting enrollment:', {
+        studentId: formData.studentId,
+        fullName: formData.fullName,
+        className: formData.className,
+        faceCount: capturedFaces.length,
+      });
+
       const response = await fetch('/api/students/enroll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,15 +119,21 @@ export default function EnrollmentPage() {
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        console.log('[v0] Enrollment successful:', data);
         toast.success('Student enrolled successfully!');
-        router.push('/dashboard');
+        setTimeout(() => router.push('/dashboard'), 1500);
       } else {
-        toast.error('Failed to enroll student');
+        console.error('[v0] Enrollment failed:', data);
+        toast.error(data.message || 'Failed to enroll student');
       }
     } catch (error) {
       console.error('[v0] Enrollment error:', error);
       toast.error('Error during enrollment');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -362,16 +373,20 @@ export default function EnrollmentPage() {
 
             <div className="flex gap-4">
               <Link href="/dashboard" className="flex-1">
-                <Button variant="outline" className="w-full bg-transparent">
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-transparent"
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </Button>
               </Link>
               <Button
                 onClick={handleSubmitEnrollment}
-                disabled={!formData.studentId || !formData.fullName || !formData.className || capturedFaces.length === 0}
+                disabled={!formData.studentId || !formData.fullName || !formData.className || capturedFaces.length === 0 || isSubmitting}
                 className="flex-1"
               >
-                Complete Enrollment
+                {isSubmitting ? 'Enrolling...' : 'Complete Enrollment'}
               </Button>
             </div>
           </CardContent>

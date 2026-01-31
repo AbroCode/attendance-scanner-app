@@ -4,10 +4,10 @@ import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import ml5 from 'ml5';
+import Loader2 from 'lucide-react'; // Declare Loader2 variable
 
 export default function ScannerPage() {
   const router = useRouter();
